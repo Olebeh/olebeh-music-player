@@ -156,7 +156,7 @@ export class Player extends TypedEmitter<PlayerEvents> {
      */
     createQueue(guild: Discord.GuildResolvable, options?: CreateQueueOptions) {
         const _guild = this.client.guilds.resolve(guild)
-        if (!_guild) throw new PlayerError(`Невідомий сервер`, ErrorStatusCode.UnknownGuild)
+        if (!_guild) throw new PlayerError(`Unknown guild`, ErrorStatusCode.UnknownGuild)
 
         const existingQueue = this.queues.find(queue => queue.id === _guild.id)
         if (existingQueue && existingQueue.exists()) return existingQueue

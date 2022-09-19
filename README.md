@@ -25,6 +25,13 @@ $ npm install --save @discordjs/opus
 
 - As an NPM module: **[https://npmjs.com/package/ffmpeg-static](https://npmjs.com/package/ffmpeg-static)**
 
+# Features
+- Beginner friendly 🆕
+- Very simple usage ✅
+- Fast and productive 🥇
+- Can be used on many servers at time 🌆
+- Very flexible, provides full control on what is streamed right now ✨
+
 ## Get started
 
 First of all, choose your language specification: TypeScript or JavaScript. TypeScript is highly recommended for use

@@ -337,7 +337,7 @@ export class Queue<State extends boolean = boolean> {
         if (this.#watchDestroyed) return
 
         const foundTrack = this.remove(track) as Track | false
-        if (!foundTrack) throw new PlayerError(`Трек не знайдено!`, ErrorStatusCode.TrackNotFound)
+        if (!foundTrack) throw new PlayerError(`Track not found!`, ErrorStatusCode.TrackNotFound)
 
         this.tracks.unshift(foundTrack)
 
@@ -454,7 +454,7 @@ export class Queue<State extends boolean = boolean> {
      */
     async play(trackToPlay?: Track, options?: { force?: boolean, seek?: number }) {
         if (this.#watchDestroyed) return
-        if (!this.connection) throw new PlayerError(`Немає підключення до голосового каналу`, ErrorStatusCode.NoConnection)
+        if (!this.connection) throw new PlayerError(`No connection to voice channel`, ErrorStatusCode.NoConnection)
         if (this.current && !options?.force) return
         if (this._queued[0] && !options?.force) return
         if (!this.connection.channel || !this.connection.channel.id) return
@@ -590,7 +590,7 @@ export class Queue<State extends boolean = boolean> {
      */
     get #watchDestroyed() {
         if (this.#destroyed) {
-            this.player.emit(`error`, new PlayerError(`Не можливо використовувати знищену чергу`, ErrorStatusCode.DestroyedQueue))
+            this.player.emit(`error`, new PlayerError(`Cannot use destroyed queue`, ErrorStatusCode.DestroyedQueue))
             return true
         }
 

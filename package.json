@@ -1,7 +1,7 @@
 {
 	"name": "olebeh-music-player",
 	"version": "1.0.2",
-	"description": "A high quality Discord Music Player that supports YouTube, Spotify and local files (for now). Ukrainian language. Now supports CJS",
+	"description": "🎵 A high quality Discord Music Player that supports YouTube, Spotify and local files (for now)",
 	"main": "./dist/index.js",
 	"types": "./typings/index.d.ts",
 	"scripts": {
@@ -15,7 +15,6 @@
 		"music",
 		"player",
 		"free",
-		"ukrainian",
 		"high-performance"
 	],
 	"author": "Olebeh",
@@ -29,5 +28,17 @@
 		"play-dl": "^1.9.5",
 		"tiny-typed-emitter": "^2.1.0",
 		"tweetnacl": "^1.0.3"
-	}
+	},
+	"directories": {
+		"example": "examples"
+	},
+	"devDependencies": {},
+	"repository": {
+		"type": "git",
+		"url": "git+https://github.com/Olebeh/olebeh-music-player.git"
+	},
+	"bugs": {
+		"url": "https://github.com/Olebeh/olebeh-music-player/issues"
+	},
+	"homepage": "https://github.com/Olebeh/olebeh-music-player#readme"
 }
