@@ -28,6 +28,7 @@ export class Player extends TypedEmitter<PlayerEvents> {
 
         this.geniusAPIToken = options?.geniusAPIToken
         this.client = client
+        if (options?.authorization) playdl.setToken(options?.authorization)
         this._playerHandler()
     }
 

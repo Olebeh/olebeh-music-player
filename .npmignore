@@ -1,5 +1,6 @@
 src/
 node_modules/
 authorization.ts
-index.ts
+main.ts
 tsconfig.json
+examples/
