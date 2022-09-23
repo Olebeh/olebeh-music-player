@@ -354,29 +354,32 @@ export class Player extends TypedEmitter<PlayerEvents> {
 
                 return await SpotifySearchResult(undefined, playlist)
             }
-        } else {
-            if (query) {
-                const trackInfo = await fetch(query)
-                const duration = await getAudioDuration(query)
-                const track = new Track(this, {
-                    title: trackInfo.headers.get('content-disposition')?.split('=')[1].split('.')[0] ?? `Unnamed track`,
-                    description: `No description provided`,
-                    requestedBy,
-                    source: 'arbitrary',
-                    duration: Util.buildTimeCode(Util.parseMS(duration * 1000)),
-                    durationMs: duration * 1000,
-                    thumbnail: requestedBy?.guild.iconURL({ size: 1024 }) ?? `https://media.discordapp.net/attachments/742730474077683773/1019795318486859876/apple-music-2020-09-25.png`,
-                    url: query,
-                    likes: 0,
-                    author: requestedBy?.guild.name ?? `Unknown author`,
-                    playlist: null
-                })
-    
-                return {
-                    playlist: null,
-                    tracks: [track]
-                } as SearchResult
-            }
+        } else if (query.match(/(?:https?):\/\/(\w+:?\w*)?(\S+)(:\d+)?(\/|\/([\w#!:.?+=&%!\-\/]))?/)) {
+            const trackInfo = await fetch(query)
+            const duration = await getAudioDuration(query).catch(() => {})
+
+            if (!duration) return {
+                playlist: null,
+                tracks: []
+            } as SearchResult
+            const track = new Track(this, {
+                title: trackInfo.headers.get('content-disposition')?.split('=')[1].split('.')[0] ?? `Unnamed track`,
+                description: `No description provided`,
+                requestedBy,
+                source: 'arbitrary',
+                duration: Util.buildTimeCode(Util.parseMS(duration * 1000)),
+                durationMs: duration * 1000,
+                thumbnail: requestedBy?.guild.iconURL({ size: 1024 }) ?? `https://media.discordapp.net/attachments/742730474077683773/1019795318486859876/apple-music-2020-09-25.png`,
+                url: query,
+                likes: 0,
+                author: requestedBy?.guild.name ?? `Unknown author`,
+                playlist: null
+            })
+
+            return {
+                playlist: null,
+                tracks: [track]
+            } as SearchResult
         }
 
         const videos = await playdl.search(query, { source: { youtube: 'video' } })
