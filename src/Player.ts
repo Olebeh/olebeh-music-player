@@ -74,7 +74,6 @@ export class Player extends TypedEmitter<PlayerEvents> {
 
         this.client.on(`voiceStateUpdate`, async (oldState, newState) => {
             if (oldState.channel?.id && !newState.channel?.id && oldState.member?.id === this.client.user.id) {
-                console.log('disconnected')
                 const queue = this.getQueue(newState.guild.id)
 
                 if (!queue) return
@@ -356,7 +355,7 @@ export class Player extends TypedEmitter<PlayerEvents> {
                 return await SpotifySearchResult(undefined, playlist)
             }
         } else {
-            if (query.includes('://cdn.discordapp.com/') || query.includes('://media.discordapp.net/') && !query.includes(' ')) {
+            if (query) {
                 const trackInfo = await fetch(query)
                 const duration = await getAudioDuration(query)
                 const track = new Track(this, {

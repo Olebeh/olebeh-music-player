@@ -108,7 +108,7 @@ export class StreamDispatcher extends EventEmitter<VoiceEvents> {
         });
 
         this.audioPlayer.on(`stateChange`, (oldState, newState) => {
-            if (newState.status === AudioPlayerStatus.Playing) {
+            if (newState.status === AudioPlayerStatus.Playing && oldState.status !== AudioPlayerStatus.Playing) {
                 if (!this.paused) return void this.emit(`start`, this.audioResource!);
             } else if (newState.status === AudioPlayerStatus.Idle && oldState.status !== AudioPlayerStatus.Idle) {
                 if (!this.paused) {
@@ -129,16 +129,14 @@ export class StreamDispatcher extends EventEmitter<VoiceEvents> {
      * @param {object} [ops] Options
      * @returns {AudioResource}
      */
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    createStream(src: Readable | Duplex | string, ops?: { type?: StreamType; data?: any; disableVolume?: boolean }): AudioResource {
-        this.audioResource = createAudioResource(src, {
+    createStream(stream: Readable | Duplex | string, ops?: { type?: StreamType; data?: any; disableVolume?: boolean }): AudioResource<Track> {
+        this.audioResource = createAudioResource(stream, {
             inputType: ops?.type ?? StreamType.Arbitrary,
             metadata: ops?.data,
-            // eslint-disable-next-line no-extra-boolean-cast
             inlineVolume: !Boolean(ops?.disableVolume)
-        });
+        })
 
-        return this.audioResource;
+        return this.audioResource
     }
 
     /**

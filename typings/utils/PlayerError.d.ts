@@ -11,7 +11,8 @@ export declare enum ErrorStatusCode {
     UnknownRepeatMode = "UnknownRepeatMode",
     TrackNotFound = "TrackNotFound",
     NoConnection = "NoConnection",
-    DestroyedQueue = "DestroyedQueue"
+    DestroyedQueue = "DestroyedQueue",
+    NotImplemented = "NotImplemented"
 }
 export declare class PlayerError extends Error {
     message: string;

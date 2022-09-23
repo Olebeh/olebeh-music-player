@@ -31,11 +31,11 @@ export declare class StreamDispatcher extends EventEmitter<VoiceEvents> {
      * @param {object} [ops] Options
      * @returns {AudioResource}
      */
-    createStream(src: Readable | Duplex | string, ops?: {
+    createStream(stream: Readable | Duplex | string, ops?: {
         type?: StreamType;
         data?: any;
         disableVolume?: boolean;
-    }): AudioResource;
+    }): AudioResource<Track>;
     /**
      * The player status
      * @type {AudioPlayerStatus}

@@ -387,6 +387,7 @@ export class Queue<State extends boolean = boolean> {
         if (!this.current) return false as If<State, boolean>
         if (position < 1) position = 0
         if (position >= this.current.durationMs) return this.skip() as If<State, boolean>
+        if (this.current.source === `arbitrary`) throw new PlayerError(`Seeking local files feature is not implemented yet`, ErrorStatusCode.NotImplemented)
 
         await this.play(this.current, { force: true, seek: position })
         return true as If<State, boolean>
@@ -469,8 +470,8 @@ export class Queue<State extends boolean = boolean> {
         const { title, author, source, url } = track
 
         if (source === `youtube`) {
-            const yt_stream = await playdl.stream(url)
-            const resource = this.connection.createStream(yt_stream.stream, { type: yt_stream.type, data: track }) as AudioResource<Track>
+            const yt_stream = await playdl.stream(url, { seek: options?.seek })
+            const resource = this.connection.createStream(yt_stream.stream, { type: yt_stream.type, data: track })
 
             await this.connection.playStream(resource, this.volume)
         } else if (source === `spotify`) {
@@ -478,12 +479,12 @@ export class Queue<State extends boolean = boolean> {
                 await playdl.refreshToken()
             }
 
-            const sp_stream = await playdl.stream(await playdl.search(`${author} ${title}`, { source: { youtube: `video` } }).then(result => result[0].url))
-            const resource = this.connection.createStream(sp_stream.stream, { type: sp_stream.type, data: track }) as AudioResource<Track>
+            const sp_stream = await playdl.stream(await playdl.search(`${author} ${title}`, { source: { youtube: `video` } }).then(result => result[0].url), { seek: options?.seek })
+            const resource = this.connection.createStream(sp_stream.stream, { type: sp_stream.type, data: track })
 
             await this.connection.playStream(resource, this.volume)
         } else if (source === `arbitrary`) {
-            const resource = this.connection.createStream(track.url, { type: StreamType.Arbitrary, data: track }) as AudioResource<Track>
+            const resource = this.connection.createStream(url, { type: StreamType.Arbitrary, data: track })
 
             await this.connection.playStream(resource, this.volume)
         }
