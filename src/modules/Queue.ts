@@ -470,12 +470,12 @@ export class Queue<State extends boolean = boolean> {
         const { title, author, source, url } = track
 
         if (source === `youtube`) {
-            const yt_stream = await playdl.stream(url, { seek: options?.seek })
+            const yt_stream = await playdl.stream(url, { seek: options?.seek ? options.seek / 1000 : undefined })
             const resource = this.connection.createStream(yt_stream.stream, { type: yt_stream.type, data: track })
 
             await this.connection.playStream(resource, this.volume)
         } else if (source === `spotify`) {
-            const sp_stream = await playdl.stream(await playdl.search(`${author} ${title}`, { source: { youtube: `video` } }).then(result => result[0].url), { seek: options?.seek })
+            const sp_stream = await playdl.stream(await playdl.search(`${author} ${title}`, { source: { youtube: `video` } }).then(result => result[0].url), { seek: options?.seek ? options.seek / 1000 : undefined })
             const resource = this.connection.createStream(sp_stream.stream, { type: sp_stream.type, data: track })
 
             await this.connection.playStream(resource, this.volume)

@@ -10,6 +10,7 @@ export declare class Player extends TypedEmitter<PlayerEvents> {
     geniusAPIToken?: string;
     readonly voiceUtils: VoiceUtils;
     readonly client: Discord.Client<true>;
+    private _spotifyToken;
     private _idleCooldowns;
     private _emptyCooldowns;
     constructor(client: Discord.Client<true>, options?: PlayerOptions);
