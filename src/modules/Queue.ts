@@ -475,10 +475,6 @@ export class Queue<State extends boolean = boolean> {
 
             await this.connection.playStream(resource, this.volume)
         } else if (source === `spotify`) {
-            if (playdl.is_expired()) {
-                await playdl.refreshToken()
-            }
-
             const sp_stream = await playdl.stream(await playdl.search(`${author} ${title}`, { source: { youtube: `video` } }).then(result => result[0].url), { seek: options?.seek })
             const resource = this.connection.createStream(sp_stream.stream, { type: sp_stream.type, data: track })
 
