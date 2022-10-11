@@ -70,7 +70,7 @@ export interface PlayerEvents {
 }
 
 export interface PlayerOptions {
-    authorization: {
+    authorization?: {
         spotify?: {
             client_id: string
             client_secret: string

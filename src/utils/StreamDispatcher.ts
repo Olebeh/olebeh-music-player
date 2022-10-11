@@ -68,15 +68,15 @@ export class StreamDispatcher extends EventEmitter<VoiceEvents> {
         this.voiceConnection.on(`stateChange`, async (_, newState) => {
             if (newState.status === VoiceConnectionStatus.Disconnected) {
                 if (newState.reason === VoiceConnectionDisconnectReason.WebSocketClose && newState.closeCode === 4014) {
-                    try {
-                        await entersState(this.voiceConnection, VoiceConnectionStatus.Connecting, this.connectionTimeout)
-                    } catch {
-                        try {
-                            if (this.voiceConnection.state.status !== VoiceConnectionStatus.Destroyed) this.voiceConnection.destroy();
-                        } catch (err) {
-                            this.emit(`error`, err as AudioPlayerError);
+                    await entersState(this.voiceConnection, VoiceConnectionStatus.Connecting, this.connectionTimeout).catch(() => {
+                        if (this.voiceConnection.state.status !== VoiceConnectionStatus.Destroyed) {
+                            try {
+                                this.voiceConnection.destroy()
+                            } catch (err) {
+                                this.emit(`error`, err as AudioPlayerError)
+                            }
                         }
-                    }
+                    })
                 } else if (this.voiceConnection.rejoinAttempts < 5) {
                     await new Promise((r) => setTimeout(r, (this.voiceConnection.rejoinAttempts + 1) * 5000).unref());
                     this.voiceConnection.rejoin();
@@ -87,13 +87,9 @@ export class StreamDispatcher extends EventEmitter<VoiceEvents> {
                         this.emit(`error`, err as AudioPlayerError);
                     }
                 }
-            } else if (newState.status === VoiceConnectionStatus.Destroyed) {
-
             } else if (!this.readyLock && (newState.status === VoiceConnectionStatus.Connecting || newState.status === VoiceConnectionStatus.Signalling)) {
                 this.readyLock = true;
-                try {
-                    await entersState(this.voiceConnection, VoiceConnectionStatus.Ready, this.connectionTimeout)
-                } catch {
+                await entersState(this.voiceConnection, VoiceConnectionStatus.Ready, this.connectionTimeout).catch(() => {
                     if (this.voiceConnection.state.status !== VoiceConnectionStatus.Destroyed) {
                         try {
                             this.voiceConnection.destroy();
@@ -101,9 +97,8 @@ export class StreamDispatcher extends EventEmitter<VoiceEvents> {
                             this.emit(`error`, err as AudioPlayerError);
                         }
                     }
-                } finally {
-                    this.readyLock = false;
-                }
+                })
+                this.readyLock = false;
             }
         });
 

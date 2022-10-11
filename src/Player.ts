@@ -20,6 +20,7 @@ export class Player extends TypedEmitter<PlayerEvents> {
     geniusAPIToken?: string
     readonly voiceUtils = new VoiceUtils()
     readonly client: Discord.Client<true>
+    private _spotifyToken = false
     private _idleCooldowns: { [guildId: string]: NodeJS.Timer } = {}
     private _emptyCooldowns: { [guildId: string]: NodeJS.Timer } = {}
 
@@ -28,7 +29,9 @@ export class Player extends TypedEmitter<PlayerEvents> {
 
         this.geniusAPIToken = options?.geniusAPIToken
         this.client = client
+
         if (options?.authorization) playdl.setToken(options?.authorization)
+        if (options?.authorization?.spotify) this._spotifyToken = true
         this._playerHandler()
     }
 
@@ -234,7 +237,7 @@ export class Player extends TypedEmitter<PlayerEvents> {
         let source = validation ? validation.split('_')[0] : undefined
         let type = validation ? validation.split('_')[1] : undefined
 
-        const YouTubeSearchResult = async (video?: YouTubeVideo, playList?: YouTubePlayList) => {
+        const YouTubeSearchResult = async (videos?: YouTubeVideo[], playList?: YouTubePlayList) => {
             const ytToTrack = (video: YouTubeVideo) => {
                 return new Track(this, {
                     title: video.title ?? `Unnamed track`,
@@ -273,8 +276,10 @@ export class Player extends TypedEmitter<PlayerEvents> {
                 })
 
                 playlist.tracks = tracks
-            } else if (video) {
-                tracks.push(ytToTrack(video))
+            } else if (videos) {
+                videos.slice(0, limit).forEach(video => {
+                    tracks.push(ytToTrack(video))
+                })
             }
 
             return {
@@ -338,13 +343,17 @@ export class Player extends TypedEmitter<PlayerEvents> {
             if (type === `video`) {
                 const tracks = await playdl.video_info(query)
 
-                return await YouTubeSearchResult(tracks.video_details)
+                return await YouTubeSearchResult([tracks.video_details])
             } else if (type === `playlist`) {
                 const playlist = await playdl.playlist_info(query)
 
                 return await YouTubeSearchResult(undefined, playlist)
             }
         } else if (source === `sp`) {
+            if (playdl.is_expired() && this._spotifyToken) {
+                await playdl.refreshToken()
+            }
+
             if (type === `track`) {
                 const tracks = await playdl.spotify(query) as SpotifyTrack
 
@@ -382,8 +391,8 @@ export class Player extends TypedEmitter<PlayerEvents> {
             } as SearchResult
         }
 
-        const videos = await playdl.search(query, { source: { youtube: 'video' } })
+        const videos = await playdl.search(query, { source: { youtube: 'video' }, limit })
 
-        return await YouTubeSearchResult(videos[0])
+        return await YouTubeSearchResult(videos)
     }
 }
