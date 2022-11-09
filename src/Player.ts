@@ -69,7 +69,8 @@ export class Player extends TypedEmitter<PlayerEvents> {
                 if (time > (max ?? 30000)) {
                     clearInterval(cooldown)
                     time = 0
-                    return queue.destroy(true)
+                    if (!queue.destroyed) return queue.destroy(true)
+                    return
                 }
                 time += 1000
             }, 1000)
@@ -134,7 +135,8 @@ export class Player extends TypedEmitter<PlayerEvents> {
                         clearInterval(cooldown)
                         time = 0
                         this.emit(`channelEmpty`, queue)
-                        return queue.destroy(true)
+                        if (!queue.destroyed) return queue.destroy(true)
+                        return
                     }
                     time += 1000
                 }, 1000)
