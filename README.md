@@ -18,10 +18,10 @@ $ npm install --save olebeh-music-player
 $ npm install --save @discordjs/opus
 ```
 
-> **NOTE**: You still need some common libraries, like [discord.js](https://discord.js.org) in order to make your bot
+> **NOTE**: Package needs [discord.js](https://discord.js.org) framework in order to work. Your may still use any other library for your bot, but note that this package will install it. 
 
 ### Install FFmpeg
-- As an application: **[https://www.ffmpeg.org/download.html](https://www.ffmpeg.org/download.html)** (recommended)
+- As an application: **[https://www.ffmpeg.org/download.html](https://www.ffmpeg.org/download.html)** (important)
 
 - As an NPM module: **[https://npmjs.com/package/ffmpeg-static](https://npmjs.com/package/ffmpeg-static)**
 
