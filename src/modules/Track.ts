@@ -13,6 +13,11 @@ export class Track {
     url: string
     likes: number
     author: string
+    live: boolean
+    /**
+     * The Date when live started, if the track is live stream
+     */
+    liveAt?: Date
     playlist: PlaylistOptions | null
     id: string
     readonly player: Player
@@ -28,6 +33,8 @@ export class Track {
         this.url = options.url
         this.likes = options.likes
         this.playlist = options.playlist
+        this.live = options.live
+        this.liveAt = options.liveAt
         this.id = options.id ?? new Date().getTime().toString()
         this.author = options.author
         this.player = player

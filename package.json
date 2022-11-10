@@ -1,6 +1,6 @@
 {
 	"name": "olebeh-music-player",
-	"version": "1.0.9",
+	"version": "1.0.10",
 	"description": "🎵 A high quality Discord Music Player that supports YouTube, Spotify and local files (for now)",
 	"main": "./dist/index.js",
 	"types": "./typings/index.d.ts",

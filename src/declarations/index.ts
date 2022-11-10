@@ -54,6 +54,8 @@ export interface TrackOptions {
     likes: number
     author: string
     id?: string
+    live: boolean
+    liveAt?: Date
     playlist: Playlist | null
 }
 

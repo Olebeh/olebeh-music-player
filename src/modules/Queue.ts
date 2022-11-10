@@ -1,6 +1,6 @@
 import Discord from 'discord.js'
 import playdl from 'play-dl'
-import { AudioResource, entersState, StreamType, VoiceConnectionStatus } from '@discordjs/voice'
+import { entersState, StreamType, VoiceConnectionStatus } from '@discordjs/voice'
 import { Player } from '../Player'
 import { CreateQueueOptions, PlayerProgressBarOptions, PlayerTimestamp, QueueRepeatMode } from '../declarations'
 import { Track } from './Track'
@@ -210,7 +210,7 @@ export class Queue<State extends boolean = boolean> {
         if (!this.current) return undefined as If<State, string>
         
         const length = !options.length ? 15 : (options.length <= 0 || options.length > 30 ? 15 : options.length)
-        const index = Math.round((this.streamTime as number / this.current.durationMs) * length)
+        const index = this.current.durationMs == Infinity ? length : Math.round((this.streamTime as number / this.current.durationMs) * length)
         const line = !options.line ? '▬' : options.line
         const indicator = !options.indicator ? '🔘' : options.indicator
 
@@ -219,14 +219,14 @@ export class Queue<State extends boolean = boolean> {
             bar.splice(index, 0, indicator)
             if (options.timecodes) {
                 const timestamp = this.getPlayerTimestamp() as PlayerTimestamp
-                return `${timestamp.current} ┃ ${bar.join(``)} ┃ ${timestamp.end}`
+                return `${timestamp.current} ┃ ${bar.join(``)} ┃ ${this.current.live ? '∞' : timestamp.end}`
             } else {
                 return `${bar.join(``)}`
             }
         } else {
             if (options.timecodes) {
                 const timestamp = this.getPlayerTimestamp() as PlayerTimestamp
-                return `${timestamp.current} ┃ ${indicator}${line.repeat(length - 1)} ┃ ${timestamp.end}`
+                return `${timestamp.current} ┃ ${indicator}${line.repeat(length - 1)} ┃ ${this.current.live ? '∞' : timestamp.end}`
             } else {
                 return `${indicator}${line.repeat(length - 1)}`
             }
@@ -291,7 +291,7 @@ export class Queue<State extends boolean = boolean> {
         return {
             current: currentTimecode,
             end: endTimecode,
-            progress: Math.round((currentStreamTime / totalTime) * 100)
+            progress: totalTime == Infinity ? 100 : Math.round((currentStreamTime / totalTime) * 100)
         } as If<State, PlayerTimestamp>
     }
 

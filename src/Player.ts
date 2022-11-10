@@ -241,16 +241,19 @@ export class Player extends TypedEmitter<PlayerEvents> {
 
         const YouTubeSearchResult = async (videos?: YouTubeVideo[], playList?: YouTubePlayList) => {
             const ytToTrack = (video: YouTubeVideo) => {
+                video.liveAt
                 return new Track(this, {
                     title: video.title ?? `Unnamed track`,
                     description: video.description ?? `No description provided`,
                     requestedBy,
                     source: `youtube`,
-                    duration: video.durationRaw,
-                    durationMs: video.durationInSec * 1000,
+                    duration: video.live ? '∞' : video.durationRaw,
+                    durationMs: (video.live ? Infinity : video.durationInSec) * 1000,
                     thumbnail: video.thumbnails[0].url,
                     url: video.url,
                     likes: video.likes,
+                    live: video.live,
+                    liveAt: video.liveAt ? new Date(video.liveAt) : undefined,
                     author: video.channel?.name ?? requestedBy?.guild.name ?? `Unknown author`,
                     playlist
                 })
@@ -302,6 +305,7 @@ export class Player extends TypedEmitter<PlayerEvents> {
                     thumbnail: track.thumbnail?.url ?? ``,
                     url: track.url,
                     likes: 0,
+                    live: false,
                     author: track.artists[0].name,
                     playlist
                 })
@@ -383,6 +387,7 @@ export class Player extends TypedEmitter<PlayerEvents> {
                 thumbnail: requestedBy?.guild.iconURL({ size: 1024 }) ?? `https://media.discordapp.net/attachments/742730474077683773/1019795318486859876/apple-music-2020-09-25.png`,
                 url: query,
                 likes: 0,
+                live: false,
                 author: requestedBy?.guild.name ?? `Unknown author`,
                 playlist: null
             })
