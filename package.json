@@ -6,7 +6,7 @@
 	"types": "./typings/index.d.ts",
 	"scripts": {
 		"update": "npm version patch && npm publish",
-		"types": "tsc --allowJs true --declaration true --emitDeclarationOnly true --outDir ./typings",
+		"types": "tsc --allowJs true --declaration true --emitDeclarationOnly true --outDir ./typings --removeComments false",
 		"compile": "tsc",
 		"test": "echo \"Error: no test specified\" && exit 1"
 	},

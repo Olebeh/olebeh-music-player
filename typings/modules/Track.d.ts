@@ -12,6 +12,11 @@ export declare class Track {
     url: string;
     likes: number;
     author: string;
+    live: boolean;
+    /**
+     * The Date when live started, if the track is live stream
+     */
+    liveAt?: Date;
     playlist: PlaylistOptions | null;
     id: string;
     readonly player: Player;
