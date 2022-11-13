@@ -10,15 +10,18 @@ import { Util } from '../utils/Utils'
 
 type If<T, A, B = undefined> = T extends true ? A : T extends false ? B : A | B
 
+/**
+ * Queue is an object that is used to manipulate with guild tracks and is unique for each guild
+ */
 export class Queue<State extends boolean = boolean> {
     /**
-     * Voice channel bot's currently in (if there's one)
+     * Voice channel bot is currently in (if there's one)
      */
     channel?: Discord.GuildTextBasedChannel
     /**
      * Queue options like leaveOnEmptyTimeout and leaveOnIdleTimeout
      */
-    options: Omit<CreateQueueOptions, `channel`> = {}
+    options: Required<Omit<CreateQueueOptions, `maxVolume` | `channel`>>
     /**
      * An array of all tracks in the queue
      */
@@ -32,15 +35,15 @@ export class Queue<State extends boolean = boolean> {
      */
     repeatMode: QueueRepeatMode = QueueRepeatMode.Off
     /**
-     * Current queue's player state (paused or not)
+     * Current queue player state (paused or not)
      */
     paused = false
     /**
-     * Current queue's volume
+     * Current queue volume
      */
     volume = 100
     /**
-     * Max queue's volume possible to set
+     * Max queue volume possible to set
      */
     maxVolume: number
     /**
@@ -74,14 +77,20 @@ export class Queue<State extends boolean = boolean> {
     private _queued: Track[] = []
     private _current?: Track
 
-    constructor(guild: Discord.Guild, player: Player, options?: CreateQueueOptions) {
+    /**
+     * @warning Don't use constructor to create new Queue instance, use Player#createQueue() instead which is much more saver and will prevent duplicated Queues
+     */
+    constructor(guild: Discord.Guild, player: Player, options: Required<Omit<CreateQueueOptions, 'channel'>> & { channel?: Discord.GuildTextBasedChannel }) {
         this.guild = guild
         this.id = guild.id
-        this.channel = options?.channel
+        this.channel = options.channel
         this.player = player
-        this.options.leaveOnEmptyTimeout = options?.leaveOnEmptyTimeout ?? 30000
-        this.options.leaveOnIdleTimeout = options?.leaveOnIdleTimeout ?? 30000
-        this.maxVolume = options?.maxVolume ?? 200
+        this.options = {
+            leaveOnEmptyTimeout: options.leaveOnEmptyTimeout,
+            leaveOnIdleTimeout: options.leaveOnIdleTimeout,
+            alwaysOn: options.alwaysOn
+        }
+        this.maxVolume = options.maxVolume
         this.#destroyed = false
     }
 
@@ -164,7 +173,7 @@ export class Queue<State extends boolean = boolean> {
 
         if (this.connection.listeners(`start`).length < 1) this.connection.on(`start`, async resource => {
             this._current = resource.metadata
-            this.player.emit(`trackStart`, this, resource.metadata)
+            if (!this._streamTime) this.player.emit(`trackStart`, this, resource.metadata)
         })
 
         if (this.connection.listeners(`finish`).length < 1) this.connection.on(`finish`, async resourse => {
@@ -450,7 +459,7 @@ export class Queue<State extends boolean = boolean> {
     /**
      * Starts the playback of the track
      * @param trackToPlay If specified, this track will start playing. Else the first track from the queue will start playing
-     * @param options Force - if true, the playback of the track will forcefully start, even if there's a track currently playing. Else won't play. Seeks track to specified time (in ms)
+     * @param options Force - if true, the playback of the track will forcefully start, even if there's a track currently playing. Else won't play; seek - seeks track to specified time (in ms)
      * @returns 
      */
     async play(trackToPlay?: Track, options?: { force?: boolean, seek?: number }) {
@@ -461,10 +470,10 @@ export class Queue<State extends boolean = boolean> {
         if (!this.connection.channel || !this.connection.channel.id) return
         if (this.connection.audioPlayer) this.connection.audioPlayer.stop()
 
+        this._streamTime = 0
         const track = !trackToPlay ? this.tracks.shift() : trackToPlay
 
         if (!track) return
-
         this._queued.push(track)
 
         const { title, author, source, url } = track
@@ -518,7 +527,7 @@ export class Queue<State extends boolean = boolean> {
     }
 
     /**
-     * Destroyed current queue without leaving the voice channel. Create just for convenience
+     * Equals to queue.destroy(false)
      * @returns 
      */
     stop() {

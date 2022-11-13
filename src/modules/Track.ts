@@ -18,6 +18,9 @@ export class Track {
      * The Date when live started, if the track is live stream
      */
     liveAt?: Date
+    /**
+     * If this track was requested from a playlist, it will appear here
+     */
     playlist: PlaylistOptions | null
     id: string
     readonly player: Player
@@ -50,6 +53,6 @@ export class Track {
     toString(includeAuthor?: boolean) {
         const { title, url, author, requestedBy, duration } = this
 
-        return `[${title}](${url}) ${includeAuthor ? `| ${author} ` : ``}| ${requestedBy ?? this.player.client.user} | \`${duration}\``
+        return `[${title}](${url}, "${author} - ${title}, ${duration}") ${includeAuthor ? `| ${author} ` : ``}| ${requestedBy ?? this.player.client.user} | \`${duration}\``
     }
 }

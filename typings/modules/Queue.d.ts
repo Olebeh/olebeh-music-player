@@ -4,16 +4,19 @@ import { CreateQueueOptions, PlayerProgressBarOptions, PlayerTimestamp, QueueRep
 import { Track } from './Track';
 import { StreamDispatcher } from '../utils/StreamDispatcher';
 declare type If<T, A, B = undefined> = T extends true ? A : T extends false ? B : A | B;
+/**
+ * Queue is an object that is used to manipulate with guild tracks and is unique for each guild
+ */
 export declare class Queue<State extends boolean = boolean> {
     #private;
     /**
-     * Voice channel bot's currently in (if there's one)
+     * Voice channel bot is currently in (if there's one)
      */
     channel?: Discord.GuildTextBasedChannel;
     /**
      * Queue options like leaveOnEmptyTimeout and leaveOnIdleTimeout
      */
-    options: Omit<CreateQueueOptions, `channel`>;
+    options: Required<Omit<CreateQueueOptions, `maxVolume` | `channel`>>;
     /**
      * An array of all tracks in the queue
      */
@@ -27,15 +30,15 @@ export declare class Queue<State extends boolean = boolean> {
      */
     repeatMode: QueueRepeatMode;
     /**
-     * Current queue's player state (paused or not)
+     * Current queue player state (paused or not)
      */
     paused: boolean;
     /**
-     * Current queue's volume
+     * Current queue volume
      */
     volume: number;
     /**
-     * Max queue's volume possible to set
+     * Max queue volume possible to set
      */
     maxVolume: number;
     /**
@@ -64,7 +67,12 @@ export declare class Queue<State extends boolean = boolean> {
      */
     private _queued;
     private _current?;
-    constructor(guild: Discord.Guild, player: Player, options?: CreateQueueOptions);
+    /**
+     * @warning Don't use constructor to create new Queue instance, use Player#createQueue() instead which is much more saver and will prevent duplicated Queues
+     */
+    constructor(guild: Discord.Guild, player: Player, options: Required<Omit<CreateQueueOptions, 'channel'>> & {
+        channel?: Discord.GuildTextBasedChannel;
+    });
     /**
      * Adds specified track or tracks to the end of the queue
      * @param tracks Track or tracks that should be added
@@ -189,7 +197,7 @@ export declare class Queue<State extends boolean = boolean> {
     /**
      * Starts the playback of the track
      * @param trackToPlay If specified, this track will start playing. Else the first track from the queue will start playing
-     * @param options Force - if true, the playback of the track will forcefully start, even if there's a track currently playing. Else won't play. Seeks track to specified time (in ms)
+     * @param options Force - if true, the playback of the track will forcefully start, even if there's a track currently playing. Else won't play; seek - seeks track to specified time (in ms)
      * @returns
      */
     play(trackToPlay?: Track, options?: {
@@ -207,7 +215,7 @@ export declare class Queue<State extends boolean = boolean> {
      */
     skip(): If<State, boolean, undefined>;
     /**
-     * Destroyed current queue without leaving the voice channel. Create just for convenience
+     * Equals to queue.destroy(false)
      * @returns
      */
     stop(): void;

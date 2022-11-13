@@ -28,9 +28,10 @@ export interface TimeData {
 
 export interface CreateQueueOptions {
     channel?: Discord.GuildTextBasedChannel
-    leaveOnEmptyTimeout?: number,
-    leaveOnIdleTimeout?: number,
-    maxVolume?: number,
+    leaveOnEmptyTimeout?: number
+    leaveOnIdleTimeout?: number
+    maxVolume?: number
+    alwaysOn?: boolean
 }
 
 export interface PlaylistOptions {

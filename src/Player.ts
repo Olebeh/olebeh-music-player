@@ -57,6 +57,8 @@ export class Player extends TypedEmitter<PlayerEvents> {
         })
 
         this.on(`queueEnd`, async queue => {
+            if (!queue.options.alwaysOn) return
+
             const max = queue.options.leaveOnIdleTimeout
             let cooldown = this._idleCooldowns[queue.id]
             let time = 0
@@ -82,14 +84,12 @@ export class Player extends TypedEmitter<PlayerEvents> {
 
                 if (!queue) return
 
-                try {
-                    queue.destroy(true)
-                } catch {}
+                if (!queue.destroyed) queue.destroy(true)
 
                 this.emit(`botDisconnect`, queue)
             }
             
-            if (!oldState.channelId) {
+            if (newState.channelId) {
                 const queue = this.getQueue(newState.guild.id)
 
                 if (!queue || !queue.connection) return
@@ -112,19 +112,17 @@ export class Player extends TypedEmitter<PlayerEvents> {
 
                 const queue = this.getQueue(oldState.guild.id)
 
-                if (!queue) return
+                if (!queue || !queue.options.alwaysOn) return
 
                 const max = queue.options.leaveOnEmptyTimeout
                 let cooldown = this._emptyCooldowns[oldState.guild.id]
                 let time = 0
 
-                if (!max) return
-
                 time = 0
 
                 cooldown = setInterval(() => {
                     members = oldState.channel?.members.filter(m => !m.user.bot).size
-
+                    console.log(max)
                     if (members) {
                         clearInterval(cooldown)
                         time = 0
@@ -154,7 +152,7 @@ export class Player extends TypedEmitter<PlayerEvents> {
 
     /**
      * Creates a new queue in the specified guild or, if it already exists, gets existed one
-     * @param guild Guild or some information about it that could be use for resolvation
+     * @param guild Guild or it's id
      * @param options Some options for creating a queue
      * @returns Created or found queue
      */
@@ -166,7 +164,13 @@ export class Player extends TypedEmitter<PlayerEvents> {
         if (existingQueue && existingQueue.exists()) return existingQueue
         else if (existingQueue && !existingQueue.exists()) this.deleteQueue(_guild)
 
-        const queue = new Queue<true>(_guild, this, options)
+        const queue = new Queue<true>(_guild, this, options = {
+            leaveOnEmptyTimeout: 30000,
+            leaveOnIdleTimeout: 30000,
+            alwaysOn: false,
+            maxVolume: 200,
+            ...options
+        })
         this.queues.push(queue)
         return queue
     }

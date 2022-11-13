@@ -17,7 +17,7 @@ export declare class Player extends TypedEmitter<PlayerEvents> {
     _playerHandler(): void;
     /**
      * Creates a new queue in the specified guild or, if it already exists, gets existed one
-     * @param guild Guild or some information about it that could be use for resolvation
+     * @param guild Guild or it's id
      * @param options Some options for creating a queue
      * @returns Created or found queue
      */

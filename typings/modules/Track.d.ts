@@ -17,6 +17,9 @@ export declare class Track {
      * The Date when live started, if the track is live stream
      */
     liveAt?: Date;
+    /**
+     * If this track was requested from a playlist, it will appear here
+     */
     playlist: PlaylistOptions | null;
     id: string;
     readonly player: Player;
