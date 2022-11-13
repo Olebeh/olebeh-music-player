@@ -122,7 +122,6 @@ export class Player extends TypedEmitter<PlayerEvents> {
 
                 cooldown = setInterval(() => {
                     members = oldState.channel?.members.filter(m => !m.user.bot).size
-                    console.log(max)
                     if (members) {
                         clearInterval(cooldown)
                         time = 0
