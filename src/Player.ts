@@ -57,7 +57,7 @@ export class Player extends TypedEmitter<PlayerEvents> {
         })
 
         this.on(`queueEnd`, async queue => {
-            if (!queue.options.alwaysOn) return
+            if (queue.options.alwaysOn) return
 
             const max = queue.options.leaveOnIdleTimeout
             let cooldown = this._idleCooldowns[queue.id]
@@ -112,7 +112,7 @@ export class Player extends TypedEmitter<PlayerEvents> {
 
                 const queue = this.getQueue(oldState.guild.id)
 
-                if (!queue || !queue.options.alwaysOn) return
+                if (!queue || queue.options.alwaysOn) return
 
                 const max = queue.options.leaveOnEmptyTimeout
                 let cooldown = this._emptyCooldowns[oldState.guild.id]
