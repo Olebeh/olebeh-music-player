@@ -214,7 +214,7 @@ export class Player extends TypedEmitter<PlayerEvents> {
         const genius = new Client()
         const songs = await genius.songs.search(trackName)
         const song = songs[0]
-        const lyrics = await song.lyrics().catch(() => {})
+        const lyrics = await song.lyrics()
 
         if (!lyrics) return
 

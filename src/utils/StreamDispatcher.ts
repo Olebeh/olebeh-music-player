@@ -65,7 +65,18 @@ export class StreamDispatcher extends EventEmitter<VoiceEvents> {
          */
         this.paused = false;
 
-        this.voiceConnection.on(`stateChange`, async (_, newState) => {
+        this.voiceConnection.on(`stateChange`, async (oldState, newState) => {
+            const oldNetworking = Reflect.get(oldState, 'networking')
+            const newNetworking = Reflect.get(newState, 'networking')
+
+            const networkStateChangeHandler = (oldNetworkState: any, newNetworkState: any) => {
+                const newUdp = Reflect.get(newNetworkState, 'udp')
+                clearInterval(newUdp?.keepAliveInterval);
+            }
+
+            oldNetworking?.off('stateChange', networkStateChangeHandler)
+            newNetworking?.on('stateChange', networkStateChangeHandler)
+
             if (newState.status === VoiceConnectionStatus.Disconnected) {
                 if (newState.reason === VoiceConnectionDisconnectReason.WebSocketClose && newState.closeCode === 4014) {
                     await entersState(this.voiceConnection, VoiceConnectionStatus.Connecting, this.connectionTimeout).catch(() => {

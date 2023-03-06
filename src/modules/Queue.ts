@@ -180,10 +180,10 @@ export class Queue<State extends boolean = boolean> {
             this._current = undefined
             this._streamTime = 0
 
+            this.player.emit(`trackEnd`, this, resourse.metadata)
+
             if (!this.connection) return
             if (resourse.metadata) this.previousTracks.unshift(resourse.metadata)
-
-            this.player.emit(`trackEnd`, this, resourse.metadata)
 
             if (
                 !this.connection.channel &&
